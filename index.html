@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Sản Phẩm</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 2em;
+        }
+
+        /* Controls Section */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            align-items: flex-end;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: #555;
+            font-size: 0.85em;
+        }
+
+        .search-box {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            width: 280px;
+            outline: none;
+        }
+
+        .search-box:focus {
+            border-color: #667eea;
+        }
+
+        select {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1em;
+            outline: none;
+            cursor: pointer;
+            background: white;
+        }
+
+        /* Sort Buttons */
+        .sort-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .sort-btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            cursor: pointer;
+            font-weight: 500;
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .sort-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .sort-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #667eea;
+        }
+
+        th {
+            padding: 14px 12px;
+            text-align: left;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            vertical-align: middle;
+        }
+
+        /* Zebra Striping - Dòng đen trắng xen kẽ */
+        tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+            color: #333;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #1a1a2e;
+            color: #ffffff;
+        }
+
+        tbody tr:nth-child(even) a,
+        tbody tr:nth-child(even) .description {
+            color: #ccc;
+        }
+
+        /* Product Image - Tối ưu hiển thị */
+        .product-image {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #f0f0f0;
+            display: block;
+        }
+
+        .image-placeholder {
+            width: 70px;
+            height: 70px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .price {
+            font-weight: bold;
+            color: #28a745;
+            font-size: 1.05em;
+        }
+
+        tbody tr:nth-child(even) .price {
+            color: #5fba7d;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 500;
+            background: #667eea;
+            color: white;
+        }
+
+        .description {
+            font-size: 0.85em;
+            color: #666;
+            max-width: 300px;
+        }
+
+        .title-cell {
+            font-weight: 600;
+            max-width: 250px;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .page-btn {
+            padding: 8px 14px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: white;
+            color: #333;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .page-info {
+            padding: 8px 12px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            font-weight: 500;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        /* Results info */
+        .results-info {
+            text-align: center;
+            margin-bottom: 12px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        /* Loading state */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+
+            th, td {
+                padding: 8px 6px;
+                font-size: 0.8em;
+            }
+
+            .product-image, .image-placeholder {
+                width: 50px;
+                height: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛍️ Dashboard Sản Phẩm</h1>
+
+        <!-- Controls -->
+        <div class="controls">
+            <div class="control-group">
+                <label for="searchInput">🔍 Tìm kiếm theo tên:</label>
+                <input type="text" id="searchInput" class="search-box" placeholder="Nhập tên sản phẩm...">
+            </div>
+
+            <div class="control-group">
+                <label for="pageSize">📄 Hiển thị:</label>
+                <select id="pageSize">
+                    <option value="5">5 sản phẩm</option>
+                    <option value="10" selected>10 sản phẩm</option>
+                    <option value="20">20 sản phẩm</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label>📊 Sắp xếp:</label>
+                <div class="sort-buttons">
+                    <button class="sort-btn" data-sort="price-asc" onclick="sortProducts('price', 'asc')">💰 Giá tăng</button>
+                    <button class="sort-btn" data-sort="price-desc" onclick="sortProducts('price', 'desc')">💰 Giá giảm</button>
+                    <button class="sort-btn" data-sort="name-asc" onclick="sortProducts('name', 'asc')">🔤 Tên A-Z</button>
+                    <button class="sort-btn" data-sort="name-desc" onclick="sortProducts('name', 'desc')">🔤 Tên Z-A</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Info -->
+        <div class="results-info" id="resultsInfo"></div>
+
+        <!-- Table -->
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Hình ảnh</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Giá ($)</th>
+                        <th>Danh mục</th>
+                        <th>Mô tả</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody">
+                    <tr><td colspan="6" class="loading">Đang tải dữ liệu...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="pagination"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
